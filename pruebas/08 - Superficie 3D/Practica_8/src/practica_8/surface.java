@@ -1,0 +1,184 @@
+package practica_8;
+
+import java.awt.*;
+import java.awt.Color;
+import java.util.*;
+
+public class surface {
+	public int x, y, z;
+	public double _x, _y, _z;
+
+	public surface(int x, int y, int z) {
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	}
+
+	public surface(double x, double y, double z) {
+		this._x = x;
+		this._y = y;
+		this._z = z;
+	}
+
+	public static ArrayList<surface> surfacePoint(surface origin, surface destiny, int div) {
+		ArrayList<surface> points = new ArrayList<surface>();
+		int x = 0;
+		int y = 0;
+		int z = 0;
+
+		ArrayList<Integer> pointsX = new ArrayList<Integer>();
+		ArrayList<Integer> pointsY = new ArrayList<Integer>();
+		ArrayList<Integer> pointsZ = new ArrayList<Integer>();
+
+		double incX = (((double) destiny.x - (double) origin.x) / (double) div);
+		double incY = (((double) destiny.y - (double) origin.y) / (double) div);
+		double incZ = (((double) destiny.z - (double) origin.z) / (double) div);
+
+		if (destiny.x == 0) {
+			for (double index = origin.y; index <= destiny.y; index += incY) {
+				pointsY.add((int) index);
+			}
+			for (double index2 = origin.z; index2 <= destiny.z; index2 += incZ) {
+				pointsZ.add((int) index2);
+			}
+			for (int varZ = 1; varZ < pointsZ.size(); varZ++) {
+				for (int varY = 1; varY < pointsY.size(); varY++) {
+
+					points.add(new surface(x, pointsY.get(varY - 1), pointsZ.get(varZ - 1)));
+					points.add(new surface(x, pointsY.get(varY), pointsZ.get(varZ - 1)));
+					points.add(new surface(x, pointsY.get(varY), pointsZ.get(varZ)));
+					points.add(new surface(x, pointsY.get(varY - 1), pointsZ.get(varZ)));
+				}
+			}
+		}
+		if (destiny.y == 0) {
+			for (double index = origin.x; index <= destiny.x; index += incX) {
+				pointsX.add((int) index);
+			}
+			for (double index2 = origin.z; index2 <= destiny.z; index2 += incZ) {
+				pointsZ.add((int) index2);
+			}
+			for (int varZ = 1; varZ < pointsZ.size(); varZ++) {
+				for (int varX = 1; varX < pointsX.size(); varX++) {
+
+					points.add(new surface(pointsX.get(varX - 1), y, pointsZ.get(varZ - 1)));
+					points.add(new surface(pointsX.get(varX), y, pointsZ.get(varZ - 1)));
+					points.add(new surface(pointsX.get(varX), y, pointsZ.get(varZ)));
+					points.add(new surface(pointsX.get(varX - 1), y, pointsZ.get(varZ)));
+				}
+			}
+		}
+
+		if (destiny.z == 0) {
+			for (double index = origin.x; index <= destiny.x; index += incX) {
+				pointsX.add((int) index);
+			}
+			for (double index2 = origin.y; index2 <= destiny.y; index2 += incY) {
+				pointsY.add((int) index2);
+			}
+			for (int varY = 1; varY < pointsY.size(); varY++) {
+				for (int varX = 1; varX < pointsX.size(); varX++) {
+
+					points.add(new surface(pointsX.get(varX - 1), pointsY.get(varY - 1), z));
+					points.add(new surface(pointsX.get(varX), pointsY.get(varY - 1), z));
+					points.add(new surface(pointsX.get(varX), pointsY.get(varY), z));
+					points.add(new surface(pointsX.get(varX - 1), pointsY.get(varY), z));
+				}
+			}
+		}
+		return points;
+	}
+
+	public static void drawSurface(ArrayList<surface> points) {
+		int limit = 1;
+		double x, y, z = 400.0;
+		double xp = -60.0;
+		double yp = -60.0;
+		double zp = -80.0;
+		ArrayList<surface> tempBase = new ArrayList<surface>();
+		ArrayList<surface> tempDeep = new ArrayList<surface>();
+
+		for (int index = 0; index < points.size(); index++) {
+
+			x = points.get(index).x + (xp * ((z - points.get(index).z) / zp));
+			y = pixel.height - (points.get(index).y + (yp * ((z - points.get(index).z) / zp)));
+
+			tempBase.add(new surface((int) x, (int) y, 0));
+
+			double tempY = (Math.sin(Math.toRadians(90 + ((points.get(index).x + points.get(index).z) / 2 * 1.125)))
+					* 80);
+
+			x = points.get(index).x + (xp * ((z - points.get(index).z) / zp));
+			y = pixel.height - (tempY + (yp * ((z - points.get(index).z) / zp)));
+
+			tempDeep.add(new surface((int) x, (int) y, 0));
+		}
+
+		for (int index = 1; index <= tempDeep.size(); index++) {
+			if (limit % 4 == 0) {
+				line.drawLine(tempDeep.get(index - 1).x, tempDeep.get(index - 1).y, tempDeep.get(index - 4).x,
+						tempDeep.get(index - 4).y, Color.GREEN);
+				limit = 1;
+			} else {
+				line.drawLine(tempDeep.get(index - 1).x, tempDeep.get(index - 1).y, tempDeep.get(index).x,
+						tempDeep.get(index).y, Color.BLUE);
+				limit++;
+			}
+		}
+	}
+
+	public static ArrayList<surface> doRotationX(ArrayList<surface> points, double degree) {
+
+		int x, y, z;
+		ArrayList<surface> jelp = new ArrayList<surface>();
+
+		for (int index = 0; index < points.size(); index++) {
+
+			x = points.get(index).x;
+			y = (int) (((double) points.get(index).y * Math.cos(Math.toRadians(degree)))
+					+ ((double) points.get(index).z * Math.sin(Math.toRadians(degree))));
+			z = (int) (((double) points.get(index).z * Math.cos(Math.toRadians(degree)))
+					- ((double) points.get(index).y * Math.sin(Math.toRadians(degree))));
+
+			jelp.add(new surface(x, y, z));
+		}
+
+		return jelp;
+	}
+
+	public static ArrayList<surface> doRotationY(ArrayList<surface> points, double degree) {
+
+		int x, y, z;
+		ArrayList<surface> jelp = new ArrayList<surface>();
+		for (int index = 0; index < points.size(); index++) {
+
+			y = points.get(index).y;
+			x = (int) (((double) points.get(index).x * Math.cos(Math.toRadians(degree)))
+					- ((double) points.get(index).z * Math.sin(Math.toRadians(degree))));
+			z = (int) (((double) points.get(index).x * Math.sin(Math.toRadians(degree)))
+					+ ((double) points.get(index).z * Math.cos(Math.toRadians(degree))));
+
+			jelp.add(new surface(x, y, z));
+		}
+
+		return jelp;
+	}
+
+	public static ArrayList<surface> doRotationZ(ArrayList<surface> points, double degree) {
+
+		int x, y, z;
+		ArrayList<surface> jelp = new ArrayList<surface>();
+		for (int index = 0; index < points.size(); index++) {
+
+			z = points.get(index).z;
+
+			x = (int) (((double) points.get(index).x * Math.cos(Math.toRadians(degree)))
+					+ ((double) points.get(index).y * Math.sin(Math.toRadians(degree))));
+			y = (int) (((double) points.get(index).y * Math.cos(Math.toRadians(degree)))
+					- ((double) points.get(index).x * Math.sin(Math.toRadians(degree))));
+			jelp.add(new surface(x, y, z));
+		}
+
+		return jelp;
+	}
+}
