@@ -17,7 +17,7 @@ public class GUI extends JFrame implements KeyListener {
         x = 525;
         y = 325;
         z = 300;
-        size = 50;
+        size = 100;
         color = Color.RED;
         int width = 1000, height = 600;
         draw = new Graphic(this, width, height);
@@ -31,7 +31,6 @@ public class GUI extends JFrame implements KeyListener {
     public void paint(Graphics g) {
         g.setColor(Color.white);
         draw.definirGraphics(g);
-        draw.direccion(7, 7, 25);
         draw.dibujarCubo(x, y, z, size, color);
     }
 

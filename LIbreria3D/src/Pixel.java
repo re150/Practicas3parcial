@@ -1,18 +1,24 @@
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
+
+import static java.lang.Math.round;
 
 public class Pixel extends JPanel implements Runnable {
-        private BufferedImage buffer;
-        private BufferedImage fondo;
-        private Graphics fondoG;
-        private int viewX = 5 , viewY = 20 , viewZ = -20;
+    private BufferedImage buffer;
+    private BufferedImage fondo;
+    private Graphics fondoG;
+    private double vertex[][][][] = {{{{-1, -1, -1}, {1, -1, -1}}, {{-1, 1, -1},{1, 1, -1}}}, {{{-1, -1, 1}, {1, -1, 1}}, {{-1, 1, 1}, {1, 1, 1}}}};
+    // rotations in radians
+    private double xyR = 0, xzR = 0, yzR = 0;
+
+    // view attributes
+    private  int IMAGE_SIZE = 500,  OFFSET = 200, DIAMETER = 8, scala = 50 ;
+    private int viewX = 5 , viewY = 20 , viewZ = -20 , tX =0, tY =0;
+
+
 
 
     public Pixel() {
@@ -28,22 +34,49 @@ public class Pixel extends JPanel implements Runnable {
                     int key = e.getKeyCode();
                     if (key == KeyEvent.VK_LEFT) {
                         viewX -=5;
+
                     }
                     if (key == KeyEvent.VK_RIGHT) {
                         viewX += 5;
+
                     }
                     if (key == KeyEvent.VK_UP) {
                         viewY -= 5;
+
                     }
                     if (key == KeyEvent.VK_DOWN) {
                         viewY +=5;
+
                     }
                     if (key == KeyEvent.VK_Z ){
                         viewZ += 5;
+                        // Ajustar rotación izquierda
+                        xyR = Math.max(xyR - 0.005, -Math.PI); // Limitar a -π
                     }
                     if (key == KeyEvent.VK_X ){
                         viewZ -= 5;
+                        // Ajustar rotación derecha
+                        xyR = Math.min(xyR + 0.005, Math.PI); // Limitar a π
                     }
+                 if (key == KeyEvent.VK_W ){
+                     tX += 5;
+                     xzR = Math.min(xzR + 0.005, Math.PI); // Limitar a π
+                 }
+                 if (key == KeyEvent.VK_S ){
+                    tX -= 5;
+                     xzR = Math.max(xzR - 0.005, -Math.PI); // Limitar a -π
+                 }
+                 if (key == KeyEvent.VK_D ){
+                     if(scala < 100) {
+                         scala += 10;
+                     }
+                 }
+                 if(key == KeyEvent.VK_A){
+                     if(scala > 10) {
+                         scala -= 10;
+                     }
+                 }
+
                 }
         });
     }
@@ -67,7 +100,6 @@ public class Pixel extends JPanel implements Runnable {
         frame.setVisible(true);
     }
 
-
     @Override
     public void update (Graphics g){
         g.drawImage(fondo, 0, 0, this);
@@ -78,9 +110,16 @@ public class Pixel extends JPanel implements Runnable {
         update(g);
         clear();
         try {
-            cubeProyection(300, 100, 0, 500, 400, 5, Color.white);
+            // practica 1
+
+            //proyeccionParalela(30, 20, 0, 50, 40, 5, Color.white);
+            //proyeccionParalela(200, 100, 5, 500, 400, 0, Color.white);
+          //  proyeccionParalela(600, 600, 5, 400, 800, 8, Color.RED);
+
+            drawCuboR();
         }catch (Exception e){}
     }
+
 
     public void clear () {
         fondoG.setColor(Color.black);
@@ -126,83 +165,113 @@ public class Pixel extends JPanel implements Runnable {
         AlgoritmoDDALine(x2, y1, x2, y2, c);
         AlgoritmoDDALine(x1, y2, x2, y2, c);
     }
-    public void cubeProyection ( int x1, int y1, int z1, int x2, int y2, int z2, Color c){
 
-        Point[] cubeOnePoints;
-        Point[] cubeTwoPoints;
+    public void proyeccionParalela(int x1, int y1, int z1, int x2, int y2, int z2, Color c) {
 
-        cubeOnePoints = oneProyection(x1, y1, z1, x2, y2, z2);
-        cubeTwoPoints = twoProyection(x1, y1, z1, x2, y2, z2);
+        int[][] cubeOnePoints;
+        int[][] cubeTwoPoints;
 
-        drawCuadrado(cubeOnePoints[0].x, cubeOnePoints[0].y, cubeOnePoints[3].x, cubeOnePoints[3].y, c);
-        drawCuadrado(cubeTwoPoints[0].x, cubeTwoPoints[0].y, cubeTwoPoints[1].x, cubeTwoPoints[1].y, c);
+        cubeOnePoints = cuboProyecion1(x1, y1, z1, x2, y2);
+        cubeTwoPoints = cuboProyecion2(x1, y1, x2, y2, z2);
+
+        drawCuadrado(cubeOnePoints[0][0], cubeOnePoints[0][1], cubeOnePoints[3][0], cubeOnePoints[3][1],c);
+        drawCuadrado(cubeTwoPoints[0][0], cubeTwoPoints[0][1], cubeTwoPoints[1][0], cubeTwoPoints[1][1], c);
+
+        // se dibujan las uniones de los cuadrados
+        AlgoritmoDDALine(cubeOnePoints[0][0], cubeOnePoints[0][1], cubeTwoPoints[1][0], cubeTwoPoints[1][1], Color.green);
+        AlgoritmoDDALine(cubeOnePoints[1][0], cubeOnePoints[1][1], cubeTwoPoints[2][0], cubeTwoPoints[2][1], Color.green);
+        AlgoritmoDDALine(cubeOnePoints[2][0], cubeOnePoints[2][1], cubeTwoPoints[0][0], cubeTwoPoints[3][1], Color.green);
+        AlgoritmoDDALine(cubeOnePoints[3][0], cubeOnePoints[3][1], cubeTwoPoints[0][0], cubeTwoPoints[0][1], Color.green);
 
 
-        for (int i = 0; i < 4; i++) {
-            putPixel(cubeOnePoints[i].x, cubeOnePoints[i].y, c);
-            putPixel(cubeTwoPoints[i].x, cubeTwoPoints[i].y, c);
+    }
 
-            if (i != 3)
-                AlgoritmoDDALine(cubeOnePoints[i].x, cubeOnePoints[i].y, cubeTwoPoints[i + 1].x, cubeTwoPoints[i + 1].y, c);
-            else
-                AlgoritmoDDALine(cubeOnePoints[i].x, cubeOnePoints[i].y, cubeTwoPoints[0].x, cubeTwoPoints[0].y, c);
+    private int[][] cuboProyecion1(int x1, int y1, int z1, int x2, int y2) {
+        int[][] points = new int[4][2];
+
+        points[0] = convert(x1, y1, z1);
+        points[1] = convert(x1, y2, z1);
+        points[2] = convert(x2, y1, z1);
+        points[3] = convert(x2, y2, z1);
+
+        return points;
+    }
+
+    private int[][] cuboProyecion2(int x1, int y1, int x2, int y2, int z2) {
+        int[][] points = new int[4][2];
+
+        points[0] = convert(x2, y2, z2);
+        points[1] = convert(x1, y1, z2);
+        points[2] = convert(x1, y2, z2);
+        points[3] = convert(x2, y1, z2);
+
+        return points;
+    }
+
+    private int[] convert(int x, int y, int z) {
+        int xconvert, yconvert;
+        xconvert = viewX - ((viewZ * (x - viewX)) / (z - viewZ) + tX) ;
+        yconvert = viewY - ((viewZ * (y - viewY)) / (z - viewZ)  + tY) ;
+
+        return new int[]{xconvert, yconvert };
+    }
+
+
+    public  void drawCuboR(){
+        // rotate cube
+        for (int x = 0; x < 2; x++) {
+            for (int y = 0; y < 2; y++) {
+                for (int z = 0; z < 2; z++) {
+                    xyRotate(vertex[x][y][z], Math.sin(xyR), Math.cos(xyR));
+                    xzRotate(vertex[x][y][z], Math.sin(xzR), Math.cos(xzR));
+                    yzRotate(vertex[x][y][z], Math.sin(yzR), Math.cos(yzR));
+                }
+            }
         }
-
+        // draw cube edges
+        for (int x = 0; x < 2; x++) {
+            for (int y = 0; y < 2; y++) {
+                drawEdge(vertex[x][y][0][0], vertex[x][y][0][1], vertex[x][y][1][0], vertex[x][y][1][1],  Color.blue);
+                drawEdge(vertex[x][0][y][0], vertex[x][0][y][1], vertex[x][1][y][0], vertex[x][1][y][1], Color.blue );
+                drawEdge(vertex[0][x][y][0], vertex[0][x][y][1], vertex[1][x][y][0], vertex[1][x][y][1],  Color.blue);
+            }
+        }
+    }
+    final void drawEdge(double x1, double y1, double x2, double y2, Color c) {
+        AlgoritmoDDALine((int) (x1 * scala) + OFFSET, (int) (-y1 * scala) + OFFSET, (int) (x2 * scala) + OFFSET, (int) (-y2 * scala) + OFFSET, c);
     }
 
-    private Point[] oneProyection ( int x1, int y1, int z1, int x2, int y2, int z2){
-        Point[] points = new Point[4];
-
-        Point Punto = convert(x1, y1, z1);
-        points[0] = new Point(Punto.x, Punto.y);
-
-        Punto = convert(x1, y2, z1);
-        points[1] = new Point(Punto.x, Punto.y);
-
-        Punto = convert(x2, y1, z1);
-        points[2] = new Point(Punto.x, Punto.y);
-
-        Punto = convert(x2, y2, z1);
-        points[3] = new Point(Punto.x, Punto.y);
-
-        return points;
-    }
-    private Point[] twoProyection ( int x1, int y1, int z1, int x2, int y2, int z2){
-        Point[] points = new Point[4];
-
-        Point Punto = convert(x2, y2, z2);
-        points[0] = new Point(Punto.x, Punto.y);
-
-        Punto = convert(x1, y1, z2);
-        points[1] = new Point(Punto.x, Punto.y);
-
-        Punto = convert(x1, y2, z2);
-        points[2] = new Point(Punto.x, Punto.y);
-
-        Punto = convert(x2, y1, z2);
-        points[3] = new Point(Punto.x, Punto.y);
-
-        return points;
+    final void xyRotate(double p[], double sin, double cos) {
+        double temp;
+        temp = cos * p[0] + sin * p[1];
+        p[1] = -sin * p[0] + cos * p[1];
+        p[0] = temp;
     }
 
-    private Point convert ( int x, int y, int z){
-        int xTemp, yTemp;
-        xTemp = viewX - ((viewZ * (x - viewX)) / (z - viewZ));
-        yTemp = viewY - ((viewZ * (y - viewY)) / (z - viewZ));
-
-        Point converted = new Point(xTemp, yTemp);
-
-        return converted;
+    final void xzRotate(double p[], double sin, double cos) {
+        double temp;
+        temp = cos * p[0] + sin * p[2];
+        p[2] = -sin * p[0] + cos * p[2];
+        p[0] = temp;
     }
 
+    final void yzRotate(double p[], double sin, double cos) {
+        double temp;
+        temp = cos * p[1] + sin * p[2];
+        p[2] = -sin * p[1] + cos * p[2];
+        p[1] = temp;
+    }
     @Override
     public void run () {
         try {
             repaint();
+            clear();
             Thread.sleep(100);
         } catch (InterruptedException ignored) {
         }
     }
+
+
 
 
 }

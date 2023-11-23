@@ -27,7 +27,7 @@ private BufferedImage buffer;
 
         buffer = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
         graPixel = buffer.createGraphics();
-        Color c = Color.BLACK;
+        Color c = Color.red;
         
         // rotate cube
         for (int x = 0; x < 2; x++) {
@@ -43,7 +43,7 @@ private BufferedImage buffer;
         // draw cube edges
         for (int x = 0; x < 2; x++) {
             for (int y = 0; y < 2; y++) {
-                drawEdge(vertex[x][y][0][0], vertex[x][y][0][1], vertex[x][y][1][0], vertex[x][y][1][1], buffer, c);
+                drawEdge(vertex[x][y][0][0], vertex[x][y][0][1], vertex[x][y][1][0], vertex[x][y][1][1], buffer, Color.blue);
                 drawEdge(vertex[x][0][y][0], vertex[x][0][y][1], vertex[x][1][y][0], vertex[x][1][y][1], buffer, c);
                 drawEdge(vertex[0][x][y][0], vertex[0][x][y][1], vertex[1][x][y][0], vertex[1][x][y][1], buffer, c);
             }
@@ -111,7 +111,8 @@ private BufferedImage buffer;
             }
         }
     }
-    
+
+
     public static void main(String[] args) throws InterruptedException {
         Practica_6 jPanel = new Practica_6();
         JFrame application = new JFrame("06 - Rotación 3D automática");

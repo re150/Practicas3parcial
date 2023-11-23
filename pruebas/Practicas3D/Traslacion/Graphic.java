@@ -11,7 +11,7 @@ public class Graphic {
     private JFrame source;
     private BufferedImage buffer;
     private Graphics graPixel;
-    private int xp, yp, zp;
+    private int xp = 7 , yp = 7, zp = 25;
     private int ancho, altura;
 
     public Graphic(JFrame source, int ancho, int altura) {
@@ -60,11 +60,7 @@ public class Graphic {
         }
     }
 
-    public void direccion(int x, int y, int z){
-        this.xp = x;
-        this.yp = y;
-        this.zp = z;
-    }
+
 
     public void dibujarCubo(int x, int y, int z, int size, Color c){
         limpiarBuffer();
@@ -83,7 +79,7 @@ public class Graphic {
         linea3D(x+size, y-size, z-size, x+size, y-size, z+size, c);
         linea3D(x+size, y+size, z-size, x+size, y+size, z+size, c);
         linea3D(x-size, y+size, z-size, x-size, y+size, z+size, c);
-        dibujar();
+
 
     }
 
