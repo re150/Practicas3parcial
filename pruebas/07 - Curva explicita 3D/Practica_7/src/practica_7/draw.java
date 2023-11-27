@@ -11,42 +11,14 @@ public class draw {
     private static int yp = 200;
     private static int zp = -130;
     private static double xf, yf, zf;
-    private static int tx = 5, num = 241;
     private static double[][] matrix = new double[4][241];
 
     static void initialize() {
         if (pixel == null) {
             pixel = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
             pixel.setRGB(0, 0, Color.BLUE.getRGB());
-            pixelColor = Color.BLUE;
+            pixelColor = Color.red;
         }
-    }
-
-    static double[][] Rotarz(double[][] m, double angle) {
-        double temp;
-        double cos = Math.cos(Math.toRadians(angle));
-        double sen = Math.sin(Math.toRadians(angle));
-        for (int i = 1; i < 241; i++) {
-            temp = m[0][i];
-            double x = m[0][i];
-            double y = m[1][i];
-            m[0][i] = (x * cos) - (y * sen);
-            m[1][i] = (x * sen) + (y * cos);
-        }
-        return m;
-    }
-
-    static double[][] Rotary(double[][] m, double angle) {
-
-        double cos = Math.cos(Math.toRadians(angle));
-        double sen = Math.sin(Math.toRadians(angle));
-        for (int i = 1; i < 241; i++) {
-            double x = m[0][i];
-            double z = m[2][i];
-            m[0][i] = (x * cos) - (z * sen);
-            m[2][i] = (x * sen) + (z * cos);
-        }
-        return m;
     }
 
     static double[][] Rotarx(double[][] m, double angle) {
@@ -92,7 +64,7 @@ public class draw {
     }
 
     static double[][] curve(double x, double y, double z) {
-        double[][] escala = { { 15, 0, 0, 0 }, { 0, 15, 0, 0 }, { 0, 0, 15, 0 }, { 0, 0, 0, 1 } };
+        double[][] escala = { { 20, 0, 0, 0 }, { 0, 20, 0, 0 }, { 0, 0, 20, 0 }, { 0, 0, 0, 1 } };
         matrix[0][0] = x;
         matrix[1][0] = y;
         matrix[2][0] = z;
@@ -107,10 +79,6 @@ public class draw {
         }
         matrix = multiply(escala, matrix);
         return matrix;
-    }
-
-    static void drawPixel(int x, int y, Graphics dest) {
-        dest.drawImage(pixel, x, y, null);
     }
 
     static double[][] multiply(double[][] a, double[][] b) {
@@ -131,6 +99,9 @@ public class draw {
         pixel.setRGB(0, 0, c.getRGB());
         pixelColor = Color.BLUE;
         line = null;
+    }
+    static void drawPixel(int x, int y, Graphics dest) {
+        dest.drawImage(pixel, x, y, null);
     }
 
     static void DDA(double x1, double y1, double z1, double x2, double y2, double z2, Graphics dest) {
@@ -161,12 +132,3 @@ public class draw {
 
 }
 
-class Point {
-    int x;
-    int y;
-
-    Point(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-}

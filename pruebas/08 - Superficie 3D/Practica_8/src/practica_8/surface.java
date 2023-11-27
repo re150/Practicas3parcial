@@ -6,18 +6,11 @@ import java.util.*;
 
 public class surface {
 	public int x, y, z;
-	public double _x, _y, _z;
 
 	public surface(int x, int y, int z) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
-	}
-
-	public surface(double x, double y, double z) {
-		this._x = x;
-		this._y = y;
-		this._z = z;
 	}
 
 	public static ArrayList<surface> surfacePoint(surface origin, surface destiny, int div) {
@@ -92,8 +85,8 @@ public class surface {
 	public static void drawSurface(ArrayList<surface> points) {
 		int limit = 1;
 		double x, y, z = 400.0;
-		double xp = -60.0;
-		double yp = -60.0;
+		double xp = -50.0;
+		double yp = -90.0;
 		double zp = -80.0;
 		ArrayList<surface> tempBase = new ArrayList<surface>();
 		ArrayList<surface> tempDeep = new ArrayList<surface>();
@@ -116,12 +109,12 @@ public class surface {
 
 		for (int index = 1; index <= tempDeep.size(); index++) {
 			if (limit % 4 == 0) {
-				line.drawLine(tempDeep.get(index - 1).x, tempDeep.get(index - 1).y, tempDeep.get(index - 4).x,
-						tempDeep.get(index - 4).y, Color.GREEN);
+				drawLine(tempDeep.get(index - 1).x, tempDeep.get(index - 1).y, tempDeep.get(index - 4).x,
+						tempDeep.get(index - 4).y, Color.red);
 				limit = 1;
 			} else {
-				line.drawLine(tempDeep.get(index - 1).x, tempDeep.get(index - 1).y, tempDeep.get(index).x,
-						tempDeep.get(index).y, Color.BLUE);
+				drawLine(tempDeep.get(index - 1).x, tempDeep.get(index - 1).y, tempDeep.get(index).x,
+						tempDeep.get(index).y, Color.red);
 				limit++;
 			}
 		}
@@ -180,5 +173,55 @@ public class surface {
 		}
 
 		return jelp;
+	}
+
+	public static void drawLine(int x1, int y1, int x2, int y2, Color color) {
+		int x, y;
+		int dx, dy, A, B, pk;
+		dx = (x2 - x1);
+		dy = (y2 - y1);
+
+		int stepy = (dy < 0) ? -1 : 1;
+		int stepx = (dx < 0) ? -1 : 1;
+
+		dy *= stepy;
+		dx *= stepx;
+
+		x = x1;
+		y = y1;
+
+		pixel.canvas.putPixel(x, y, color);
+		if (dx > dy) {
+			pk = (2 * dy) - dx;
+			A = 2 * dy;
+			B = (2 * dy) - (2 * dx);
+
+			while (x != x2) {
+				x = x + stepx;
+				if (pk < 0) {
+					pk = pk + A;
+				} else {
+					y = y + stepy;
+					pk = pk + B;
+				}
+
+				pixel.canvas.putPixel(x, y, color);
+			}
+		} else {
+			pk = (2 * dx) - dy;
+			A = 2 * dx;
+			B = (2 * dx) - (2 * dy);
+			while (y != y2) {
+				y = y + stepy;
+				if (pk < 0) {
+					pk = pk + A;
+				} else {
+					x = x + stepx;
+					pk = pk + B;
+				}
+
+				pixel.canvas.putPixel(x, y, color);
+			}
+		}
 	}
 }

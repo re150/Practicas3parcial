@@ -7,10 +7,7 @@ import java.awt.*;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.Color;
-/**
- *
- * @author lalo_
- */
+
 public class Practica_7 extends JFrame implements KeyListener {
 
     private Image buffer;
@@ -19,7 +16,7 @@ public class Practica_7 extends JFrame implements KeyListener {
     private double tethay = 0;
     private double tethaz = 0;
     private double[][] matrix = new double[4][241];
-    private double xo = 200, yo = 200, zo = 1, zi;
+    private double xo =0, yo = 0, zo = 0, zi;
     private double x, y, z, xf, yf, zf;
 
     private Practica_7() {
@@ -31,6 +28,7 @@ public class Practica_7 extends JFrame implements KeyListener {
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         buffer = createImage(getWidth(), getHeight());
+        System.out.println("zo = " + zo);
         matrix = draw.curve(xo, yo, zi);
 
     }
@@ -41,8 +39,8 @@ public class Practica_7 extends JFrame implements KeyListener {
         Graphics buffg = buffer.getGraphics();
         buffg.setColor(getBackground());
         buffg.fillRect(0, 0, this.getSize().width, this.getSize().height);
-        draw.setColor(new Color(75,0,130));
-        for (int i = 23; i < 229; i++) {
+        draw.setColor(new Color(130,0, 4));
+        for (int i = 23; i < 200; i++) {
             x = matrix[0][i];
             y = matrix[1][i];
             z = matrix[2][i];
@@ -61,13 +59,13 @@ public class Practica_7 extends JFrame implements KeyListener {
 
     public void animacion() {
         while (true) {
-            actualiza();
+          // actualiza();
             matrix = draw.translateOrigin(matrix);
             matrix = draw.Rotarx(matrix, tethax);
             matrix = draw.Rotarx(matrix, tethay);
             matrix = draw.Rotarx(matrix, tethaz);
             matrix = draw.change(matrix);
-            direccion = 0;
+            //direccion = 0;
             repaint();
             try {
                 Thread.sleep(10);

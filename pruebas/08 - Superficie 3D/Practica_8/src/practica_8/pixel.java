@@ -46,10 +46,9 @@ public class pixel {
     }
 
     public static void clear() {
-
         for (int i = 0; i < canvas.buffer.getWidth(); i++) {
             for (int j = 0; j < canvas.buffer.getHeight(); j++) {
-                canvas.putPixel(i, j, Color.WHITE, false);
+                canvas.putPixel(i, j, Color.BLACK, false);
             }
         }
     }
